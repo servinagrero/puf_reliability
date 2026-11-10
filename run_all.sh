@@ -3,7 +3,8 @@ set -euo pipefail
 
 export MPLCONFIGDIR="${MPLCONFIGDIR:-/tmp/pufre-matplotlib}"
 
-ARTIFACT="data/puf_artifact.h5"
+ARTIFACT="${PUFRE_ARTIFACT:-data/puf_artifact.h5}"
+N_JOBS="${PUFRE_N_JOBS:-8}"
 QC_DIR="data/error_qc"
 DEPENDENCY_DIR="data/error_dependency"
 GRAPH_DIR="data/error_graph"
@@ -17,12 +18,20 @@ case "${1:-}" in
         ;;
     -h|--help)
         printf 'Usage: %s [--force]\n' "$0"
+        printf 'Environment:\n'
+        printf '  PUFRE_ARTIFACT  Unified HDF5 artifact path\n'
+        printf '  PUFRE_N_JOBS    Parallel worker count (default: 8)\n'
         exit 0
         ;;
 esac
 if (( $# > 0 )); then
     printf 'Unknown argument: %s\n' "$1" >&2
     printf 'Usage: %s [--force]\n' "$0" >&2
+    exit 2
+fi
+
+if ! [[ "${N_JOBS}" =~ ^[1-9][0-9]*$ ]]; then
+    printf 'PUFRE_N_JOBS must be a positive integer: %s\n' "${N_JOBS}" >&2
     exit 2
 fi
 
@@ -65,7 +74,7 @@ run_stage "error QC and repeated predictive validation" \
     --max-iter 500 \
     --max-tuning-bits 8 \
     --cv-splits 2 \
-    --n-jobs 8
+    --n-jobs "${N_JOBS}"
 
 run_stage "conditional-independence tests" \
     "${HYPOTHESIS_DIR}/permutation_null.csv" \
@@ -81,7 +90,7 @@ run_stage "conditional-independence tests" \
     --families SRAM_STM32 \
     --families SRAM_XMC4500 \
     --n-permutations 999 \
-    --n-jobs 8
+    --n-jobs "${N_JOBS}"
 
 run_stage "directed dependency models" "${DEPENDENCY_DIR}/summary.csv" \
     uv run python scripts/run_error_dependency_studies.py \
@@ -89,7 +98,7 @@ run_stage "directed dependency models" "${DEPENDENCY_DIR}/summary.csv" \
     --study-name error_dependency \
     --output-dir "${DEPENDENCY_DIR}" \
     --regularization-csv "${QC_DIR}/validation.csv" \
-    --n-jobs 8
+    --n-jobs "${N_JOBS}"
 
 run_stage "graph studies" "${GRAPH_DIR}/graph_summary.csv" \
     uv run python scripts/run_error_graph_studies.py \
@@ -100,7 +109,7 @@ run_stage "graph studies" "${GRAPH_DIR}/graph_summary.csv" \
     --bootstrap-replicates 50 \
     --bootstrap-min-probability 0.5 \
     --max-iter 500 \
-    --n-jobs 8
+    --n-jobs "${N_JOBS}"
 
 run_stage "graph independence null" \
     "${GRAPH_DIR}/independence_null_summary.csv" \
@@ -118,7 +127,7 @@ run_stage "graph independence null" \
     --bootstrap-replicates 50 \
     --bootstrap-min-probability 0.5 \
     --max-iter 500 \
-    --n-jobs 8
+    --n-jobs "${N_JOBS}"
 
 uv run python scripts/plot_error_qc.py \
     --qc-dir "${QC_DIR}" \

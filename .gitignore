@@ -5,6 +5,23 @@ build/
 dist/
 wheels/
 *.egg-info
+.pytest_cache/
+.ruff_cache/
 
 # Virtual environments
-.venv
+.venv/
+
+# Local archives and generated documentation
+backup/
+backup*.tar.*
+site/
+
+# Local research notes
+context.md
+transcript-codex.md
+
+# Data and generated study outputs
+data/*
+!data/README.md
+figures/
+tables/

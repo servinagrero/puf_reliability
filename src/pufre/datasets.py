@@ -7,7 +7,6 @@ import numpy as np
 import numpy.typing as npt
 
 from pufre.metrics import reliable_entropy_score
-from pufre.utils import PUFData
 
 
 @dataclass(frozen=True)
@@ -19,23 +18,6 @@ class FamilyResponses:
     reference: npt.NDArray
     labels: npt.NDArray
     metadata: dict = field(default_factory=dict)
-
-    def to_puf_data(self) -> PUFData:
-        """Convert an artifact family directly to ``PUFData``.
-
-        The artifact response/reference datasets are already sliced to the selected
-        bit set. Downstream code works in local coordinates 0..n_bits-1; physical
-        source bit indices remain metadata only.
-        """
-        metadata = dict(self.metadata)
-        metadata["n_bits"] = int(self.responses.shape[2])
-        return PUFData.from_binary(
-            self.responses,
-            self.reference,
-            bit_ids=np.arange(self.responses.shape[2]),
-            metadata=metadata,
-        )
-
 
 @dataclass(frozen=True)
 class DatasetConfig:

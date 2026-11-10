@@ -4,7 +4,7 @@ from typing import Optional
 import numpy as np
 import numpy.typing as npt
 
-from pufre.utils import binary_to_polar, polar_to_binary
+from pufre.data.encoding import binary_to_polar, polar_to_binary
 
 
 @dataclass(frozen=True)
