@@ -1,0 +1,128 @@
+---
+title: "Anatomy of a PUF: How bitflip nature impacts PUF Quality"
+date: today
+format:
+  beamer:
+    aspectratio: 169
+    navigation: horizontal
+    # pdf-engine: pdflatex
+    # theme: metropolis
+    theme: Boadilla
+    slide-level: 2
+    # colortheme: lily
+    # mainfont: STIX Two Text
+    include-in-header:
+        - text: |
+            \usepackage{amsmath,amssymb,amsfonts}
+            \usepackage{caption}
+            \usepackage{algorithm,algpseudocode}
+            \setbeamertemplate{navigation symbols}{}
+            \setbeamertemplate{footline}[page number]
+            \usepackage{fontspec}
+            \setsansfont{TeX Gyre Heros}[Scale=MatchLowercase] % Helvetica alternative
+            \setmonofont{JetBrains Mono}[Scale=0.85]
+            \renewcommand{\familydefault}{\sfdefault}
+---
+
+
+
+# Introduction
+
+
+## PUF
+
+$$
+f: X \to Y \to \tilde{Y} = \{0,1\}^n \to \{0,1\}^m \to \{0,1\}^m
+$$
+
+PUF response = deterministic identity/function + stochastic noise channel
+
+:::{.columns}
+
+:::{.width 50%}
+:::
+
+:::{.width 50%}
+$$
+Y \to \tilde{Y}
+$$
+Studies the noise model
+
+:::
+
+:::
+
+## Motivation
+
+PUFs are complex physical systems and the noise model could be also complex.
+
+The objective is to provide a mathematical framework to understand the noise channel in a simple way that helps designers and attackers
+
+## Utility
+
+  - Which bits flip?
+  - How often do they flip?
+  - Do flips occur independently or in correlated groups?
+  - Are some bits conditionally associated with flips in other bits?
+  - Are those associations stable across devices, sessions, or environments?
+  - Can the noise process be predicted better than by independent per-bit flip rates?
+
+:::{.columns}
+
+:::{.width 50%}
+For designers, this provides:
+
+- Detect groups of bits that fail together.
+- Avoid selecting ECC blocks with correlated error structure.
+- Choose helper-data blocks with lower joint failure risk.
+- Identify bits that are reliable alone but dangerous in combination.
+- Compare freezer/roomT/hot/voltage/aging conditions.
+- Estimate whether failures are independent, clustered, bursty, or persistent.
+- Design interleaving strategies for ECC.
+- Decide whether best-bit selection should penalize correlated errors, not just individual flip rate.
+:::
+
+:::{.width 50%}
+For attackers, it is also useful:
+
+- Correlated flips reduce effective entropy.
+- Predictable noise can help reconstruct stable responses.
+- Environmental patterns can leak structure.
+- If flip events are conditionally predictable, repeated queries may reveal more than expected.
+- A learned noise model can improve denoising or confidence-weighted attacks.
+- Correlated helper-data failures can reveal weak regions of the PUF.
+:::
+
+:::
+
+## Framework
+
+:::{.columns}
+
+:::{.width 30%}
+Hamiltonian Metrics
+
+Related to the physics
+:::
+
+:::{.width 30%}
+Graph Theory
+
+Useful for ECCs
+:::
+
+:::{.width 30%}
+RBM
+
+Allows to model the noise model
+:::
+
+:::
+
+## Loss gain
+
+Held-out log-loss gain = independent log loss - error-Ising log loss
+
+# Future Work
+
+
